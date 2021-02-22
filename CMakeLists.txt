@@ -62,11 +62,20 @@ set(EXTRA_LIBS ${LEGGED_SDK_NAME} lcm)
 
 set(CMAKE_CXX_FLAGS "-O3")
 
-#find_package(unitree_legged_msgs REQUIRED)
-#add_executable(walk_operator src/exe/walk_operators.cpp)
-#target_link_libraries(walk_operator ${EXTRA_LIBS} ${catkin_LIBRARIES})
-#ament_target_dependencies(walk_operator rclcpp ${${PEOJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS} unitree_legged_msgs)
+find_package(unitree_legged_msgs REQUIRED)
+add_executable(walk_operator src/exe/walk_operators.cpp)
+target_link_libraries(walk_operator ${EXTRA_LIBS} ${catkin_LIBRARIES})
+ament_target_dependencies(walk_operator rclcpp ${${PEOJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS} unitree_legged_msgs)
+install(TARGETS
+  walk_operator
+  DESTINATION lib/${PROJECT_NAME})
 
+add_executable(simple_pub src/exe/simple_pub.cpp)
+target_link_libraries(simple_pub ${EXTRA_LIBS} ${catkin_LIBRARIES})
+ament_target_dependencies(simple_pub rclcpp ${${PEOJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS} unitree_legged_msgs)
+install(TARGETS
+  simple_pub
+  DESTINATION lib/${PROJECT_NAME})
 
 add_executable(setup_udp src/exe/setup_udp.cpp)
 target_link_libraries(setup_udp ${EXTRA_LIBS} ${colcon_LIBRARIES})

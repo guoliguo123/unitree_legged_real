@@ -13,7 +13,7 @@ Use of this source code is governed by the MPL-2.0 license, see LICENSE.
 #include <unitree_legged_msgs/msg/high_state.h>
 #include <unitree_legged_msgs/msg/motor_cmd.h>
 #include <unitree_legged_msgs/msg/motor_state.h>
-#include <unitree_legged_msgs//msg/imu.h>
+#include <unitree_legged_msgs/msg/imu.h>
 
 enum firmworkVersion{
     V3_1,

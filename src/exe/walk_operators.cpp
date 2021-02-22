@@ -23,10 +23,24 @@ bool finished = false;
 using namespace UNITREE_LEGGED_SDK;
 using unitree_legged_msgs::msg::Walk2s;
 
-
 void walk_callback(const Walk2s::SharedPtr msg)
 {
+	if (finished) {
+		return;
+	}
+
 	RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "I heard: [%d]", msg->time);
+
+	UDP udp(HIGHLEVEL);
+
+    	HighCmd cmd = {0};
+	udp.InitCmdData(cmd);
+
+    	HighCmd standCmd = {0};
+	standCmd.mode = 1;
+	udp.SetSend(standCmd);
+	udp.Send();
+	finished = true;
 }
 
 
