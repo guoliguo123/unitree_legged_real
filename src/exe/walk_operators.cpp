@@ -7,68 +7,28 @@
 #include <pthread.h>
 #include <time.h>
 #include <string>
-#include <boost/thread.hpp>
-#include <boost/thread/mutex.hpp>
+//#include <boost/thread.hpp>
+//#include <boost/thread/mutex.hpp>
 //#include <unitree_legged_msgs/HighCmd.h>
 //#include <unitree_legged_msgs/HighState.h>
 //unitree_legged_msgs/msg/walk2s.h
-#include "unitree_legged_msgs/msg/walk2s.h"
+#include "unitree_legged_msgs/msg/walk2s.hpp"
 #include "unitree_legged_sdk/unitree_legged_sdk.h"
-#include "convert.h"
+//#include "convert.h" //TODO Solve the unitree_legged_msgs:: namespace issue
+
+#include <iostream>
+#include <rclcpp/rclcpp.hpp>
 
 bool finished = false;
 using namespace UNITREE_LEGGED_SDK;
+using unitree_legged_msgs::msg::Walk2s;
 
-void walkCallback(const unitree_legged_msgs::walk_2s& walk_msg)
+
+void walk_callback(const Walk2s::SharedPtr msg)
 {
-	
-	ROS_INFO("callback");
-	if (finished) {
-		//ROS_INFO("finished skip");
-		return;
-	}
-
-	finished = true;
-
-	ROS_INFO("I heard: [%d]", walk_msg.time);
-
-    HighCmd standCmd = {0};
-    //unitree_legged_msgs::HighCmd walkCmd = {0};
-	standCmd.mode = 1;
-
-	UDP udp(HIGHLEVEL);
-
-	udp.SetSend(standCmd);
-	udp.Send();
-
-	sleep(2);
-/*
-    HighCmd walkCmd = {0};
-    //unitree_legged_msgs::HighCmd walkCmd = {0};
-	walkCmd.forwardSpeed = 0.2f;
-
-	UDP udp(2);
-
-	udp.SetSend(walkCmd);
-	udp.Send();
-*/
-	
-	
-
-	
-
-/*
-     unitree_legged_msgs::HighCmd walk;
-     int time;
-     walk = walk_msg.highcmd;
-     time = walk_msg.time;
-     UNITREE_LEGGED_SDK::HighCmd walk_sdk;
-     walk_sdk = ToLcm(walk, walk_sdk);
-     UNITREE_LEGGED_SDK::LCM roslcm(UNITREE_LEGGED_SDK::HIGHLEVEL);
-     //roslcm.Send(walk_sdk);
-     ROS_INFO("speed: [%f]", walk.forwardSpeed);
-*/
+	RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "I heard: [%d]", msg->time);
 }
+
 
 //template<typename TCmd, typename TState, typename TLCM>
 int mainhelper(int argc, char *argv[]){
@@ -77,14 +37,25 @@ int mainhelper(int argc, char *argv[]){
               << "Press Enter to continue..." << std::endl;
     std::cin.ignore();
 
-    ros::NodeHandle n;
-    ros::Subscriber sub = n.subscribe("walk", 1000, walkCallback);
-    ros::spin();
+    //ros::NodeHandle n;
+    //ros::Subscriber sub = n.subscribe("walk", 1000, walkCallback);
+    //ros::spin();
+    //
+    // Create a new node
+    // Create new sub from the node
+    //   rclcpp::Subscription<tutorial_interfaces::msg::Num>::SharedPtr subscription_;       // CHANGE
+
+    auto node = std::make_shared<rclcpp::Node>("my_node_name");
+    rclcpp::Subscription<Walk2s>::SharedPtr subscription_ = node->create_subscription<Walk2s>("topic", 10, walk_callback);
+		    
+
+    rclcpp::spin(node);
+    rclcpp::shutdown();
 }
 
 
 int main(int argc, char *argv[]){
-    ros::init(argc, argv, "walk_ros");
+    rclcpp::init(argc, argv);
 
     UNITREE_LEGGED_SDK::LeggedType rname = UNITREE_LEGGED_SDK::LeggedType::A1;
 
